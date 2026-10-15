@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Eye, ImageUp, LoaderCircle, ShieldAlert, X } from "lucide-react";
 import type { VisionExtraction } from "@/lib/ai/vision";
 import { buildVisionProposal } from "@/lib/ai/vision-proposal";
+import { DEMO_ACCESS_GUIDANCE } from "@/lib/presentation/ux-guidance";
 
 export interface VisionProposal {
   price?: string;
@@ -55,7 +56,7 @@ export function VisionOffer({ onApply }: { onApply: (proposal: VisionProposal) =
     <div className="vision-disclosure"><ShieldAlert/><p>La imagen se enviará a Google Gemini para procesarla externamente. Usa solo ejemplos ficticios, nunca estados de cuenta ni documentos personales. Aplican las políticas de retención y uso de datos de Google.</p></div>
     <div className="vision-controls">
       <label className="field"><span>Imagen ficticia (PNG, JPEG o WebP; máximo 2 MB)</span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => setFile(event.target.files?.[0])}/></label>
-      <label className="field"><span>Código de acceso del demo</span><input type="password" maxLength={100} autoComplete="off" value={accessCode} onChange={(event) => setAccessCode(event.target.value)} placeholder="No es tu clave de Gemini"/></label>
+      <label className="field"><span>Código de acceso del demo</span><input type="password" maxLength={100} autoComplete="off" value={accessCode} onChange={(event) => setAccessCode(event.target.value)} placeholder="No es tu clave de Gemini"/><small>{DEMO_ACCESS_GUIDANCE}</small></label>
     </div>
     <label className="check"><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)}/><span>Entiendo que esta imagen ficticia se enviará a un proveedor externo de IA para extraer datos visibles.</span></label>
     <button className="secondary" disabled={!file || !consent || !accessCode || loading} onClick={readOffer}>{loading ? <LoaderCircle className="spin"/> : <Eye/>}{loading ? "Leyendo…" : "Leer oferta ficticia"}</button>

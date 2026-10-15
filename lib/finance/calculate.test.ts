@@ -55,6 +55,19 @@ describe("motor financiero determinista", () => {
     expect(calculateFinancing({ ...base(), incomePattern: "irregular" }).budgetStatus).toBe("unknown");
   });
 
+  it("no vuelve a restar obligaciones del presupuesto que la persona ya capturó como disponible", () => {
+    const result = calculateFinancing({
+      ...base(),
+      availableBudgetCents: 90_000,
+      obligations: [
+        { id: "a", label: "Obligación A", amountCents: 30_000, dueDate: "2026-11-15" },
+        { id: "b", label: "Obligación B", amountCents: 25_000, dueDate: "2026-11-15" },
+      ],
+    });
+    expect(result.budgetStatus).toBe("within");
+    expect(result.overlaps[0]?.totalCents).toBe(55_000);
+  });
+
   it.each([0, -10_000])("no marca dentro del presupuesto cuando es %i", (availableBudgetCents) => {
     expect(calculateFinancing({ ...base(), availableBudgetCents }).budgetStatus).toBe("exceeds");
   });
