@@ -41,3 +41,13 @@ Se actualizará al terminar cada ciclo con: qué cambió, qué funciona, qué fa
 - **Observación preliminar 1:** las preguntas de comprensión aparecen únicamente después de ver tanto la calculadora como la explicación. Por ello, el flujo actual no establece de manera independiente si la explicación mejora la comprensión frente a la calculadora.
 - **Observación preliminar 2:** los mensajes verdes que indican que la mensualidad está dentro del límite elegido podrían crear falsa confianza cuando las comisiones y el costo final siguen siendo desconocidos.
 - **Decisión inmediata:** documentar ambos riesgos sin rediseñar todavía la aplicación. La siguiente mejora deberá elegirse y justificarse después del primer despliegue verificado.
+
+### 2026-10-15 — Deployment 1 verificado
+
+- **Repositorio:** `https://github.com/anamariabuilds-source/debt-check-mx.git`; `main` fue publicado sin force-push y conservó sus ocho commits existentes.
+- **Commit desplegado:** `677603f6216ef2a95471b4fbf666177bf113df8a`.
+- **Vercel:** proyecto `anamaria-builds/debt-check-mx`; deployment `dpl_DEdZSdqSXQKxQF5NYfJLaef4LNNr`; estado reportado `READY`.
+- **URL de producción:** `https://debt-check-mx.vercel.app`.
+- **Verificación pública:** la portada respondió HTTP 200 y mostró el título `Debt Check MX — Reality Test`, `DEMO · DATOS FICTICIOS` y `Antes de comprar`. El endpoint `/api/explain` respondió `SIMULATED AI OUTPUT` y preservó `feeKnowledge: UNKNOWN`.
+- **Honestidad:** este despliegue verifica disponibilidad técnica, no comprensión, ventaja de IA ni evidencia de usuarios.
+- **Siguiente acción:** elegir una mejora genuina a partir de la revisión manual documentada, probarla, hacer un único push y verificar Deployment 2.

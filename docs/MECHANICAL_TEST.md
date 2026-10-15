@@ -30,10 +30,9 @@ Entorno local: Node 24.19.0, Next.js 16.4.1, Vitest 5.0.5. Datos exclusivamente 
 - **Corrección:** cada fecha capturada de la compra entra al mismo mapa con el importe anunciado, sin inventar fechas faltantes.
 - **Regresión:** M18 verifica IDs, fecha y suma exacta de 1,100 MXN. La suite completa pasó: 3 archivos, 19 pruebas.
 - **Verificación técnica:** `npm test`, `npm run typecheck`, `npm run lint` y `npm run build` pasan localmente.
-- **Despliegue / redepliegue:** no ejecutados. No existe sesión de Vercel, CLI ni remoto GitHub en este entorno. No hay URL que verificar.
+- **Deployment 1:** verificado el 2026-10-15 en `https://debt-check-mx.vercel.app`, deployment `dpl_DEdZSdqSXQKxQF5NYfJLaef4LNNr`, commit `677603f`. La portada pública y `/api/explain` respondieron correctamente. Deployment 2 continúa pendiente de una mejora genuina.
 
 ## Hallazgos adicionales
 
 - La primera build falló porque `next/font` intentó descargar Google Fonts sin red. Se sustituyó por una pila de tipografías del sistema; la build posterior pasó.
 - La auditoría de producción (`npm audit --omit=dev`) reporta 0 vulnerabilidades. El árbol de desarrollo conserva 5 avisos altos transitivos en `eslint-config-next`/`fast-glob`; la corrección sugerida por npm degrada Next ESLint a 14.2.35 y no se aplicó.
-

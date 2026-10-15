@@ -39,3 +39,9 @@ npm audit --omit=dev
 No hay base de datos, login, banca ni persistencia. El endpoint `/api/explain` valida tamaño y esquema; actualmente siempre responde en modo simulado. Nunca uses variables `NEXT_PUBLIC_` para secretos.
 
 Consulta `docs/PACKET.md`, `docs/MECHANICAL_TEST.md`, `docs/COMPARISON_TEST.md`, `docs/ECONOMICS.md` y `DECISIONS.md` para alcance y evidencia.
+
+## Deployment 1
+
+Producción verificada: https://debt-check-mx.vercel.app
+
+La URL corresponde al primer despliegue técnico. No demuestra ventaja de IA ni resultados con participantes.
