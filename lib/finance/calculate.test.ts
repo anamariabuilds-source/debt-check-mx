@@ -37,6 +37,20 @@ describe("motor financiero determinista", () => {
     expect(result.overlaps).toEqual([{ date: "2026-11-01", obligationIds: ["a", "b"], totalCents: 55_000 }]);
   });
 
+  it("detecta coincidencia entre una mensualidad de la compra y una obligación existente", () => {
+    const result = calculateFinancing({
+      ...base(),
+      dueDates: ["2026-11-01"],
+      obligations: [{ id: "renta", label: "Renta", amountCents: 50_000, dueDate: "2026-11-01" }],
+    });
+    expect(result.overlaps).toEqual([{
+      date: "2026-11-01",
+      obligationIds: ["purchase-installment-1", "renta"],
+      totalCents: 110_000,
+    }]);
+    expect(result.warnings).toContain("Hay pagos conocidos que coinciden en la misma fecha.");
+  });
+
   it("no certifica capacidad con ingreso irregular", () => {
     expect(calculateFinancing({ ...base(), incomePattern: "irregular" }).budgetStatus).toBe("unknown");
   });
@@ -91,4 +105,3 @@ describe("motor financiero determinista", () => {
     expect(calculateFinancing({ ...base(), obligationsComplete: false }).missing).toContain("Confirmación de todas las obligaciones existentes");
   });
 });
-

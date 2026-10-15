@@ -9,19 +9,19 @@ import type { FeeStatus, FinancingInput, IncomePattern, KnownObligation } from "
 type Step = "datos" | "calculadora" | "explicacion" | "prueba";
 type FormState = {
   price: string; count: string; installment: string; feeStatus: FeeStatus; fees: string;
-  budget: string; incomePattern: IncomePattern; limit: string; obligationsComplete: boolean;
+  budget: string; incomePattern: IncomePattern; limit: string; paymentDates: string; obligationsComplete: boolean;
   obligations: Array<{ id: string; label: string; amount: string; date: string }>;
 };
 
 const demo: FormState = {
   price: "3600", count: "6", installment: "600", feeStatus: "unknown", fees: "",
-  budget: "800", incomePattern: "regular", limit: "650", obligationsComplete: false,
+  budget: "800", incomePattern: "regular", limit: "650", paymentDates: "", obligationsComplete: false,
   obligations: [],
 };
 
 const empty: FormState = {
   price: "", count: "", installment: "", feeStatus: "unknown", fees: "", budget: "",
-  incomePattern: "regular", limit: "", obligationsComplete: false, obligations: [],
+  incomePattern: "regular", limit: "", paymentDates: "", obligationsComplete: false, obligations: [],
 };
 
 const steps: Array<{ id: Step; label: string }> = [
@@ -38,6 +38,8 @@ function toInput(form: FormState): FinancingInput | undefined {
   const fees = form.fees ? parseMxnToCents(form.fees) : undefined;
   const limit = form.limit ? parseMxnToCents(form.limit) : undefined;
   if ((form.installment && installment === undefined) || (form.fees && fees === undefined) || (form.limit && limit === undefined)) return;
+  const dueDates = form.paymentDates.split(",").map((date) => date.trim()).filter(Boolean);
+  if (dueDates.some((date) => !/^\d{4}-\d{2}-\d{2}$/.test(date))) return;
   const obligations: KnownObligation[] = [];
   for (const item of form.obligations) {
     const amount = parseMxnToCents(item.amount);
@@ -48,7 +50,7 @@ function toInput(form: FormState): FinancingInput | undefined {
     purchasePriceCents: price, installmentCount: count, advertisedInstallmentCents: installment,
     feeStatus: form.feeStatus, knownFeesCents: fees, availableBudgetCents: budget,
     incomePattern: form.incomePattern, optionalLimitCents: limit, obligations,
-    obligationsComplete: form.obligationsComplete,
+    obligationsComplete: form.obligationsComplete, dueDates: dueDates.length ? dueDates : undefined,
   };
 }
 
@@ -109,6 +111,7 @@ export function DebtCheck() {
             <MoneyField label="Presupuesto disponible al mes" value={form.budget} onChange={(v) => update("budget", v)} required hint="Lo que queda después de gastos y obligaciones que sí conoces." allowNegative />
             <label className="field"><span>¿Tu ingreso es regular?</span><select value={form.incomePattern} onChange={(e) => update("incomePattern", e.target.value as IncomePattern)}><option value="regular">Sí, suele ser estable</option><option value="irregular">No, cambia cada mes</option></select></label>
             <MoneyField label="Mi límite opcional por cuota" value={form.limit} onChange={(v) => update("limit", v)} hint="Puedes cambiarlo o eliminarlo cuando quieras." />
+            <Field label="Fechas conocidas de las cuotas (AAAA-MM-DD, separadas por coma)" value={form.paymentDates} onChange={(v) => update("paymentDates", v)} placeholder="2026-11-01, 2026-12-01" />
           </div>
 
           <div className="obligations">

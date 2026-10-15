@@ -43,6 +43,12 @@ export function calculateFinancing(input: FinancingInput): FinancingResult {
     : installment === undefined ? "unknown" : installment <= input.optionalLimitCents ? "within" : "exceeds";
 
   const dated = new Map<string, Array<{ id: string; cents: number }>>();
+  input.dueDates?.forEach((date, index) => {
+    dated.set(date, [
+      ...(dated.get(date) ?? []),
+      { id: `purchase-installment-${index + 1}`, cents: installment ?? 0 },
+    ]);
+  });
   input.obligations.forEach((item) => {
     if (!item.dueDate) return;
     dated.set(item.dueDate, [...(dated.get(item.dueDate) ?? []), { id: item.id, cents: item.amountCents }]);
@@ -60,7 +66,7 @@ export function calculateFinancing(input: FinancingInput): FinancingResult {
   if (difference !== undefined && difference !== 0) warnings.push(`Hay una diferencia sin explicar de ${formatMxn(Math.abs(difference))}.`);
   if (input.incomePattern === "irregular") warnings.push("El ingreso es irregular; no se puede confirmar que la cuota quepa cada mes.");
   if (input.availableBudgetCents <= 0) warnings.push("El presupuesto disponible es cero o negativo.");
-  if (overlaps.length) warnings.push("Hay obligaciones conocidas que coinciden en la misma fecha.");
+  if (overlaps.length) warnings.push("Hay pagos conocidos que coinciden en la misma fecha.");
 
   const facts: FinancingResult["facts"] = [
     { label: "Precio capturado", value: formatMxn(input.purchasePriceCents), knowledge: "USER_ENTERED" },
