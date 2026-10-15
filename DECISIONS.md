@@ -21,3 +21,14 @@
 
 Se actualizará al terminar cada ciclo con: qué cambió, qué funciona, qué falló o sigue sin probarse y la siguiente tarea concreta.
 
+### 2026-10-15 — Implementación y prueba mecánica
+
+- **Qué cambió:** motor financiero en centavos, validación Zod server-side, formulario responsive, calculadora, explicación simulada, comprensión y documentación económica/comparativa.
+- **Qué funciona:** 19 pruebas; TypeScript, lint y build de producción pasan. La calculadora funciona sin IA y el modo explicativo está visible como `SIMULATED AI OUTPUT`.
+- **Bug real:** no se comparaban fechas conocidas de la nueva compra contra obligaciones existentes. Se agregó al detector y M18 demuestra la regresión.
+- **Seguridad:** sin secretos ni persistencia; límite de request de 16 KiB; `npm audit --omit=dev` = 0 vulnerabilidades. Quedan avisos transitivos de desarrollo en el stack ESLint que npm solo propone resolver degradando una dependencia mayor.
+- **Decisión de tipografía:** se eliminó `next/font` después de que la build offline no pudo llegar a Google Fonts. Se usa una pila local del sistema.
+- **Lo no probado:** navegación visual en navegador real, lector de pantalla, Playwright, participantes reales, persona sintética en conversación nueva y proveedor LLM real.
+- **Despliegue:** bloqueado por ausencia de autenticación/CLI de Vercel y remoto GitHub. No se afirma Deploy 1 ni Deploy 2.
+- **Blueprint / Dragon Stack:** el archivo continúa ausente y la ambigüedad continúa sin resolver.
+- **Primer paso siguiente:** conectar el repositorio a GitHub/Vercel, ejecutar Deploy 1, verificar URL; luego hacer la prueba persona en conversación nueva y desplegar su corrección real como Deploy 2.
