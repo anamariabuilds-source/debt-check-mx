@@ -12,6 +12,7 @@ Este repositorio parte de un paquete de diseño previo al código. El producto c
 - Presupuesto, ingreso irregular, límite opcional reversible y pagos coincidentes.
 - Comparación entre calculadora y explicación determinista, rotulada `SIMULATED AI OUTPUT`.
 - Autoevaluación de comprensión que no almacena respuestas.
+- Explicación opcional con Gemini y lectura opcional de una oferta ficticia, ambas con consentimiento y código de acceso del demo.
 
 ## Desarrollo
 
@@ -36,7 +37,30 @@ npm audit --omit=dev
 
 ## Privacidad y configuración
 
-No hay base de datos, login, banca ni persistencia. El endpoint `/api/explain` valida tamaño y esquema; actualmente siempre responde en modo simulado. Nunca uses variables `NEXT_PUBLIC_` para secretos.
+No hay base de datos, login, banca ni persistencia. La calculadora permanece en el navegador. La IA externa es opcional, solo para datos e imágenes ficticias, y requiere consentimiento explícito.
+
+Configura localmente, sin compartir valores en chats ni Git:
+
+```bash
+cp .env.example .env.local
+```
+
+Define en `.env.local`:
+
+- `GEMINI_API_KEY`: clave server-side de Google AI Studio.
+- `AI_DEMO_ACCESS_TOKEN`: código diferente que se entrega únicamente durante la demostración supervisada.
+
+En Vercel deben configurarse como variables de entorno de producción. Ninguna usa el prefijo `NEXT_PUBLIC_`.
+
+Sin consentimiento, clave o código válido, `/api/explain` conserva `SIMULATED AI OUTPUT`; `/api/vision` no llama al proveedor y la captura manual continúa disponible.
+
+## Dragon Stack
+
+1. **LLM real:** Gemini `gemini-3.5-flash-lite` explica hechos calculados sin cambiar cifras.
+2. **Datos de restricciones del usuario:** oferta, presupuesto, regularidad del ingreso, obligaciones, fechas y límite opcional.
+3. **Visión real:** el mismo modelo lee una captura ficticia y devuelve una propuesta no verificada que la persona corrige y confirma campo por campo.
+
+El motor determinista continúa como única fuente de verdad financiera.
 
 Consulta `docs/PACKET.md`, `docs/MECHANICAL_TEST.md`, `docs/COMPARISON_TEST.md`, `docs/ECONOMICS.md` y `DECISIONS.md` para alcance y evidencia.
 

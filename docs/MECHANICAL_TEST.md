@@ -41,3 +41,17 @@ Entorno local: Node 24.19.0, Next.js 16.4.1, Vitest 5.0.5. Datos exclusivamente 
 ## Corrección de Persona Test sintético antes de Deployment 2
 
 El hallazgo proporcionado fue falsa seguridad causada por la confirmación verde “Dentro de tu límite elegido”. `p test.docx` no estaba presente y no fue inspeccionado; no se agregaron hallazgos distintos de los reproducidos por el usuario. La corrección M19 neutraliza el mensaje cuando existen datos materiales desconocidos y coloca la advertencia de incertidumbre junto a la comparación en ambas experiencias.
+
+## Dragon Stack — prueba preproducción
+
+La suite añade casos separados para consentimiento ausente, clave faltante, respuesta Gemini válida, error, timeout, cifra inventada, preservación de UNKNOWN, autonomía y etiquetas real/simulada. Visión cubre imagen ficticia válida, firma no compatible, límite de tamaño, comisiones/fechas ausentes, ambigüedad, confirmación selectiva, rechazo, error y respuesta malformada.
+
+Las respuestas de proveedor están simuladas en la suite para que las pruebas normales no consuman cuota. Además, el 2026-10-15 se hizo una comprobación local separada con credenciales reales no impresas y datos exclusivamente ficticios:
+
+- **Explicación:** `gemini-3.5-flash-lite` devolvió `mode: real` y `EXPLICACIÓN GENERADA CON IA`. Conservó comisiones y fechas desconocidas, ingreso irregular, pagos coincidentes y control del comprador. El resultado determinista siguió mostrando subtotal 3,600, diferencia 0, comisiones `UNKNOWN`, fechas `UNKNOWN` y coincidencia conocida de 550. No hubo aprobación de compra ni recálculo del modelo.
+- **Visión:** sobre una oferta ficticia que mostraba 3,600 MXN, 6 mensualidades de 600 MXN y que no indicaba comisiones ni fechas, devolvió exactamente `purchasePrice: 3600`, `installmentCount: 6`, `advertisedInstallment: 600`, `knownFees: null`, `feeStatus: UNKNOWN`, `dueDates: []` y `verified: false`.
+- **Falla segura observada:** una solicitud concurrente de explicación cayó al fallback rotulado sin exponer la causa interna; una repetición aislada obtuvo respuesta real. La calculadora no perdió resultados.
+- **Corrección real:** la primera respuesta válida incluyó una referencia demasiado positiva a estar dentro del límite. Se endurecieron instrucción y validación, se añadió regresión y la siguiente respuesta real aclaró que solo la cuota anunciada cumple el límite elegido y que esto no confirma capacidad de pago.
+- **Suite final:** 5 archivos, 43 pruebas; TypeScript, lint y build de producción pasan. `npm audit --omit=dev` reporta 0 vulnerabilidades.
+
+Esta evidencia es local y no implica que la integración ya esté publicada o verificada en Vercel.

@@ -1,10 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AlertTriangle, ArrowRight, Brain, Calculator, Check, ChevronLeft, Info, LockKeyhole, Pencil, RotateCcw, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { AlertTriangle, ArrowRight, Brain, Calculator, Check, ChevronLeft, Info, LoaderCircle, LockKeyhole, Pencil, RotateCcw, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import { calculateFinancing } from "@/lib/finance/calculate";
 import { formatMxn, parseMxnToCents } from "@/lib/finance/money";
 import { getLimitMessage, hasMaterialUnknowns } from "@/lib/presentation/limit-message";
+import { VisionOffer, type VisionProposal } from "@/components/vision-offer";
+import type { ExplanationResponse } from "@/lib/ai/explain";
 import type { FeeStatus, FinancingInput, IncomePattern, KnownObligation } from "@/types/finance";
 
 type Step = "datos" | "calculadora" | "explicacion" | "prueba";
@@ -69,6 +71,7 @@ export function DebtCheck() {
   }, [input]);
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((old) => ({ ...old, [key]: value }));
+  const applyVisionProposal = (proposal: VisionProposal) => setForm((old) => ({ ...old, ...proposal }));
   const go = (next: Step) => { setError(""); setStep(next); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const calculate = () => {
     if (!result) { setError("Revisa los campos marcados. Usa montos entre $0 y $1,000,000 MXN."); return; }
@@ -114,6 +117,8 @@ export function DebtCheck() {
             <MoneyField label="Mi límite opcional por cuota" value={form.limit} onChange={(v) => update("limit", v)} hint="Puedes cambiarlo o eliminarlo cuando quieras." />
             <Field label="Fechas conocidas de las cuotas (AAAA-MM-DD, separadas por coma)" value={form.paymentDates} onChange={(v) => update("paymentDates", v)} placeholder="2026-11-01, 2026-12-01" />
           </div>
+
+          <VisionOffer onApply={applyVisionProposal}/>
 
           <div className="obligations">
             <div><h3>Obligaciones que ya conoces <span>OPCIONAL</span></h3><p>Agrega solo datos ficticios. Las fechas no se infieren.</p></div>
@@ -165,5 +170,31 @@ function MoneyField({ label, value, onChange, hint, allowNegative, ...props }: C
 function ResultShell({ icon, label, title, subtitle, back, next, nextLabel, children }: { icon: React.ReactNode; label: string; title: string; subtitle: string; back: () => void; next: () => void; nextLabel: string; children: React.ReactNode }) { return <section className="panel result-panel"><div className="result-header"><div className="result-icon">{icon}</div><div><p className="step-kicker">{label}</p><h2>{title}</h2><p>{subtitle}</p></div></div>{children}<div className="actions"><button className="ghost" onClick={back}><ChevronLeft size={18}/> Atrás</button><button className="primary" onClick={next}>{nextLabel}<ArrowRight size={18}/></button></div></section>; }
 function CalculatorView({ input, result }: { input: FinancingInput; result: ReturnType<typeof calculateFinancing> }) { const payment = input.advertisedInstallmentCents; return <div className="calculator-layout"><div className="amount-card"><span>Mensualidad anunciada</span><strong>{payment === undefined ? "DESCONOCIDA" : formatMxn(payment)}</strong><small>Dato capturado · no incluye cargos desconocidos</small></div><div className="metric-grid">{result.facts.slice(1, 4).map((fact) => <div className="metric" key={fact.label}><span>{fact.label}</span><b>{fact.value}</b><small className={`tag ${fact.knowledge.toLowerCase()}`}>{fact.knowledge}</small></div>)}</div><StatusCards result={result}/></div>; }
 function StatusCards({ result }: { result: ReturnType<typeof calculateFinancing> }) { const limitMessage = getLimitMessage(result); const materialUnknowns = hasMaterialUnknowns(result); return <div className="status-stack">{limitMessage && <div className={`notice ${limitMessage.tone === "warning" ? "warn" : limitMessage.tone === "neutral" ? "info" : "good"}`}>{limitMessage.tone === "warning" ? <AlertTriangle/> : <Info/>}<div><b>{limitMessage.title}</b><p>{limitMessage.detail}</p></div></div>}{result.budgetStatus === "unknown" ? <div className="notice warn"><AlertTriangle/><div><b>No se puede confirmar capacidad mensual</b><p>Con los datos disponibles, no sabemos si esta cuota será pagable cada mes.</p></div></div> : <div className={`notice ${result.budgetStatus === "exceeds" ? "warn" : materialUnknowns ? "info" : "good"}`}><Info/><div><b>{result.budgetStatus === "within" ? "La cuota anunciada está debajo del presupuesto capturado" : "La cuota anunciada supera el presupuesto capturado"}</b><p>{result.budgetStatus === "within" && materialUnknowns ? "Esto no confirma que la compra sea asequible: el costo final u otros datos siguen desconocidos." : "Es una comparación matemática, no una aprobación ni una recomendación de compra."}</p></div></div>}{result.warnings.map((warning) => <div className="notice warn" key={warning}><AlertTriangle/><div><b>Revisa</b><p>{warning}</p></div></div>)}<div className="missing"><h3>Información que falta</h3>{result.missing.length ? <ul>{result.missing.map((item) => <li key={item}>{item}</li>)}</ul> : <p>No detectamos campos desconocidos en esta captura.</p>}</div></div>; }
-function ExplanationView({ input, result }: { input: FinancingInput; result: ReturnType<typeof calculateFinancing> }) { const payment = input.advertisedInstallmentCents; const limitMessage = getLimitMessage(result); const summary = payment === undefined ? "No conocemos la cuota anunciada, así que no podemos compararla." : limitMessage?.title ?? "No elegiste un límite opcional para esta cuota."; const uncertain = hasMaterialUnknowns(result); return <div className="ai-view"><div className="simulation"><Sparkles size={18}/><b>SIMULATED AI OUTPUT</b><span>Modo explicativo determinista · no usa un modelo externo</span></div><div className={`ai-summary ${uncertain ? "uncertain" : ""}`}><Info/><div><h3>{summary}</h3>{uncertain && <p>Esta comparación no confirma que la compra sea asequible. Aún falta información importante.</p>}</div></div><div className="prose"><p>{payment === undefined ? "La mensualidad anunciada es desconocida." : `La mensualidad que capturaste es ${formatMxn(payment)}.`} {result.budgetStatus === "within" ? "Está debajo del presupuesto mensual que ingresaste, pero eso no demuestra capacidad de pago futura." : result.budgetStatus === "exceeds" ? "Supera el presupuesto mensual que ingresaste." : "No podemos confirmar si cabe cada mes porque el ingreso es irregular o faltan datos."}</p><p>{result.feeKnowledge === "UNKNOWN" ? "No conocemos las comisiones. Por eso el total final todavía es desconocido." : `Las comisiones registradas son ${formatMxn(result.knownFeesCents ?? 0)} y el total verificable con estos datos es ${formatMxn(result.verifiedFinalTotalCents ?? 0)}.`} Las fechas que no ingresaste también permanecen desconocidas.</p><p>Esto no predice el futuro ni te dice si debes comprar. <b>Tú tienes la última decisión.</b></p></div><StatusCards result={result}/><div className="same-facts"><ShieldCheck/><div><b>Mismos datos, misma aritmética</b><p>Esta explicación no cambia ninguna cifra de la calculadora.</p></div></div></div>; }
+function ExplanationView({ input, result }: { input: FinancingInput; result: ReturnType<typeof calculateFinancing> }) {
+  const [consent, setConsent] = useState(false);
+  const [accessCode, setAccessCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [providerExplanation, setProviderExplanation] = useState<ExplanationResponse>();
+  const payment = input.advertisedInstallmentCents;
+  const limitMessage = getLimitMessage(result);
+  const summary = payment === undefined ? "No conocemos la cuota anunciada, así que no podemos compararla." : limitMessage?.title ?? "No elegiste un límite opcional para esta cuota.";
+  const uncertain = hasMaterialUnknowns(result);
+
+  async function requestExplanation() {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/explain", { method: "POST", headers: { "Content-Type": "application/json", "x-demo-access-token": accessCode }, body: JSON.stringify({ input, consent: true }) });
+      const data = await response.json() as { explanation?: ExplanationResponse };
+      if (data.explanation) setProviderExplanation(data.explanation);
+    } finally { setLoading(false); }
+  }
+
+  return <div className="ai-view">
+    <div className={`simulation ${providerExplanation?.mode === "real" ? "real" : ""}`}><Sparkles size={18}/><b>{providerExplanation?.label ?? "SIMULATED AI OUTPUT"}</b><span>{providerExplanation?.mode === "real" ? "Google Gemini · explicación externa" : "Modo explicativo determinista · no usa un modelo externo"}</span></div>
+    <div className={`ai-summary ${uncertain ? "uncertain" : ""}`}><Info/><div><h3>{summary}</h3>{uncertain && <p>Esta comparación no confirma que la compra sea asequible. Aún falta información importante.</p>}</div></div>
+    {providerExplanation?.mode === "real" ? <div className="prose">{providerExplanation.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div> : <div className="prose"><p>{payment === undefined ? "La mensualidad anunciada es desconocida." : `La mensualidad que capturaste es ${formatMxn(payment)}.`} {result.budgetStatus === "within" ? "Está debajo del presupuesto mensual que ingresaste, pero eso no demuestra capacidad de pago futura." : result.budgetStatus === "exceeds" ? "Supera el presupuesto mensual que ingresaste." : "No podemos confirmar si cabe cada mes porque el ingreso es irregular o faltan datos."}</p><p>{result.feeKnowledge === "UNKNOWN" ? "No conocemos las comisiones. Por eso el total final todavía es desconocido." : `Las comisiones registradas son ${formatMxn(result.knownFeesCents ?? 0)} y el total verificable con estos datos es ${formatMxn(result.verifiedFinalTotalCents ?? 0)}.`} Las fechas que no ingresaste también permanecen desconocidas.</p><p>Esto no predice el futuro ni te dice si debes comprar. <b>Tú tienes la última decisión.</b></p></div>}
+    <div className="ai-consent"><p><b>Explicación externa opcional</b> · El cálculo permanece en tu navegador. Si aceptas, solo los datos ficticios estructurados se envían a Google Gemini. Google puede aplicar sus políticas de retención y uso de datos.</p><label className="check"><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)}/><span>Entiendo que los datos ficticios de este ejemplo se enviarán a un proveedor externo de IA para generar la explicación.</span></label><label className="field"><span>Código de acceso del demo</span><input type="password" maxLength={100} autoComplete="off" value={accessCode} onChange={(event) => setAccessCode(event.target.value)} placeholder="No es tu clave de Gemini"/></label><button className="secondary" disabled={!consent || !accessCode || loading} onClick={requestExplanation}>{loading ? <LoaderCircle className="spin"/> : <Sparkles/>}{loading ? "Generando…" : "Generar explicación con IA"}</button></div>
+    <StatusCards result={result}/><div className="same-facts"><ShieldCheck/><div><b>Mismos datos, misma aritmética</b><p>La IA no cambia ninguna cifra de la calculadora.</p></div></div>
+  </div>;
+}
 function Question({ id, label, options, answers, setAnswers }: { id: string; label: string; options: string[]; answers: Record<string, string>; setAnswers: React.Dispatch<React.SetStateAction<Record<string, string>>> }) { return <fieldset className="question"><legend>{label}</legend><div>{options.map((option) => <label key={option} className={answers[id] === option ? "selected" : ""}><input type="radio" name={id} value={option} checked={answers[id] === option} onChange={() => setAnswers((old) => ({ ...old, [id]: option }))}/><span>{option}</span></label>)}</div></fieldset>; }

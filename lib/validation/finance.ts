@@ -26,3 +26,7 @@ export const financingInputSchema = z.object({
   }
 });
 
+export const explanationRequestSchema = z.object({
+  input: financingInputSchema,
+  consent: z.boolean(),
+});

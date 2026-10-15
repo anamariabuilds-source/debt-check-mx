@@ -62,3 +62,20 @@ Se actualizará al terminar cada ciclo con: qué cambió, qué funciona, qué fa
 - **Control del comprador:** ningún mensaje aprueba, prohíbe o bloquea la compra; el límite continúa editable y removible.
 - **Cálculos:** no se cambió el motor financiero ni se alteró ningún resultado verificado.
 - **Regresión:** pruebas específicas verifican tono neutral, mención de datos faltantes, ausencia del mensaje ambiguo y preservación del control cuando el límite se supera.
+
+### 2026-10-15 — Integración incremental Dragon Stack (preproducción)
+
+- **Alcance:** se preservaron las pantallas y el motor. Se reutilizó `/api/explain`, se añadió `/api/vision` y dos controles opcionales dentro de las pantallas existentes.
+- **Componente 1:** inferencia server-side real con Google Gemini `gemini-3.5-flash-lite`; salida JSON limitada, timeout de 8 segundos, máximo de 350 tokens y validación de cifras/afirmaciones. El fallback sigue rotulado `SIMULATED AI OUTPUT`.
+- **Componente 2:** los datos de restricciones existentes no cambiaron y continúan siendo efímeros.
+- **Componente 3:** visión Gemini sobre PNG/JPEG/WebP ficticios de máximo 2 MB. Se valida firma real del archivo, no solo MIME. La respuesta es propuesta `verified: false`; nada se transfiere sin selección y confirmación explícitas.
+- **Privacidad:** consentimiento desmarcado por defecto y divulgación de procesamiento externo. El nivel gratuito de Gemini puede usar contenido enviado y respuestas para mejorar productos y permitir revisión humana; por ello se prohíben datos reales, sensibles o personales en este demo.
+- **Abuso/costo:** la inferencia real requiere `AI_DEMO_ACCESS_TOKEN`, distinto de la API key, más límite en memoria de 6 solicitudes por tipo cada 10 minutos e IP/instancia. El límite en memoria no es global en Vercel y no basta por sí solo; el código supervisado es el control primario. No se expone un proxy abierto.
+- **Modelo/costo:** Google documenta `gemini-3.5-flash-lite` como estable, multimodal y apto para resultados estructurados. A 2026-10-15, la tabla oficial muestra entrada y salida sin cargo en free tier; en pago estándar muestra USD 0.30 por millón de tokens de entrada y USD 2.50 por millón de tokens de salida (incluye tokens de razonamiento). No se midió consumo ni se afirma costo real.
+- **Compatibilidad real:** la primera verificación con `gemini-2.5-flash-lite` recibió 404 porque Google limita esa familia a proyectos con uso previo. Se adoptó el reemplazo estable que indicó la propia API, `gemini-3.5-flash-lite`, sin cambiar la arquitectura.
+- **Verificación real local:** con credenciales locales no impresas, Gemini produjo una explicación real para el caso ficticio de 3,600 MXN en 6 mensualidades de 600 MXN. La respuesta conservó comisiones y fechas desconocidas, ingreso irregular, obligaciones incompletas y la coincidencia de dos pagos; no modificó el resultado determinista ni aprobó la compra. Un intento concurrente activó correctamente el fallback sin exponer la causa interna; la repetición aislada fue real y válida.
+- **Verificación visual real:** Gemini leyó la imagen ficticia preparada y propuso exactamente precio 3,600, 6 mensualidades y cuota 600; devolvió `knownFees: null`, `feeStatus: UNKNOWN`, `dueDates: []` y `verified: false`. La imagen no contenía datos personales.
+- **Regresión de falsa tranquilidad:** una primera explicación real usó una formulación ambigua sobre estar dentro del límite. Se reforzó el prompt y el validador para exigir que solo la mensualidad anunciada se compare con el límite autoelegido y que esto no confirme capacidad de pago. La respuesta real posterior cumplió esa distinción.
+- **Verificación técnica local:** 43 pruebas pasan; TypeScript, lint y build pasan; `npm audit --omit=dev` reporta 0 vulnerabilidades.
+- **Estado honesto:** los tres componentes funcionan localmente con datos ficticios. La integración todavía no está publicada ni verificada en Vercel.
+- **Publicación:** pendiente de aprobación explícita de Fase D; no se ha hecho push ni deployment nuevo.

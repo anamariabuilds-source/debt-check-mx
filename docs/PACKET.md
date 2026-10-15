@@ -144,3 +144,9 @@ For each decision, record: date, context, option chosen/rejected, reason, Bluepr
 - Confirm an actual no-cost, protected, server-side LLM option; otherwise prototype must visually disclose simulated AI and cannot claim a real LLM stack.
 
 **References:** Team Blueprint (uploaded); Individual ADVERSARY brief (uploaded); Undebt.it official pages above. All planned build/testing activities remain unperformed.
+
+## Amendment — 2026-10-15 · Dragon Stack real
+
+Este apartado es una modificación posterior al Packet original; no se presenta como parte del diseño previo al código. Para resolver la ambigüedad académica se añadió, sin cambiar el motor financiero: (1) explicación opcional con inferencia real de Gemini, (2) los mismos datos de restricciones del usuario y (3) visión real opcional para leer una oferta ficticia. La imagen produce una propuesta no verificada y manualmente confirmable; la calculadora continúa manual-first, determinista y funcional sin IA.
+
+La transmisión externa requiere consentimiento explícito y código de acceso supervisado. El demo prohíbe información personal/real porque las condiciones oficiales del nivel gratuito de Gemini permiten usar contenido para mejorar productos. La integración no se considerará operativa ni desplegada hasta verificar llamadas reales con credenciales server-side y ejemplos completamente ficticios.

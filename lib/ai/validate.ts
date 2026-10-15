@@ -26,8 +26,7 @@ export function validateExplanation(text: string, result: FinancingResult): Expl
     const parsed = normalizeNumber(raw);
     if (parsed !== undefined && !allowed.has(parsed)) return { valid: false, reason: `Número no respaldado: ${raw}` };
   }
-  const forbidden = [/te conviene/i, /debes comprar/i, /aprob(?:ado|ada)/i, /garantiz/i, /sin riesgo/i];
+  const forbidden = [/te conviene/i, /debes comprar/i, /aprob(?:ado|ada)/i, /garantiz/i, /sin riesgo/i, /puedes (?:pagar|comprar)/i, /estás dentro de (?:tu|un) límite/i];
   if (forbidden.some((pattern) => pattern.test(text))) return { valid: false, reason: "Afirmación no permitida." };
   return { valid: true };
 }
-
