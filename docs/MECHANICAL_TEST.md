@@ -22,6 +22,7 @@ Entorno local: Node 24.19.0, Next.js 16.4.1, Vitest 5.0.5. Datos exclusivamente 
 | M16 | Comisión confirmada cero vs. desconocida | 3,600 solo en caso confirmado | 3,600 vs. desconocido | PASA |
 | M17 | Obligaciones incompletas | Mostrar incertidumbre | falta “Confirmación…” | PASA |
 | M18 | Cuota nueva y renta misma fecha | Detectar coincidencia y total 1,100 | detectado tras corrección | PASA |
+| M19 | Cuota debajo del límite con comisiones/fechas desconocidas | Estilo neutral; aclarar que solo compara cantidades y no demuestra asequibilidad | mensaje neutral compartido por calculadora y explicación; texto ambiguo eliminado | PASA |
 
 ## Bug real, corrección y regresión
 
@@ -36,3 +37,7 @@ Entorno local: Node 24.19.0, Next.js 16.4.1, Vitest 5.0.5. Datos exclusivamente 
 
 - La primera build falló porque `next/font` intentó descargar Google Fonts sin red. Se sustituyó por una pila de tipografías del sistema; la build posterior pasó.
 - La auditoría de producción (`npm audit --omit=dev`) reporta 0 vulnerabilidades. El árbol de desarrollo conserva 5 avisos altos transitivos en `eslint-config-next`/`fast-glob`; la corrección sugerida por npm degrada Next ESLint a 14.2.35 y no se aplicó.
+
+## Corrección de Persona Test sintético antes de Deployment 2
+
+El hallazgo proporcionado fue falsa seguridad causada por la confirmación verde “Dentro de tu límite elegido”. `p test.docx` no estaba presente y no fue inspeccionado; no se agregaron hallazgos distintos de los reproducidos por el usuario. La corrección M19 neutraliza el mensaje cuando existen datos materiales desconocidos y coloca la advertencia de incertidumbre junto a la comparación en ambas experiencias.

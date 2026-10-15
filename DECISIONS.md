@@ -51,3 +51,14 @@ Se actualizará al terminar cada ciclo con: qué cambió, qué funciona, qué fa
 - **Verificación pública:** la portada respondió HTTP 200 y mostró el título `Debt Check MX — Reality Test`, `DEMO · DATOS FICTICIOS` y `Antes de comprar`. El endpoint `/api/explain` respondió `SIMULATED AI OUTPUT` y preservó `feeKnowledge: UNKNOWN`.
 - **Honestidad:** este despliegue verifica disponibilidad técnica, no comprensión, ventaja de IA ni evidencia de usuarios.
 - **Siguiente acción:** elegir una mejora genuina a partir de la revisión manual documentada, probarla, hacer un único push y verificar Deployment 2.
+
+### 2026-10-15 — Corrección posterior a Persona Test sintético
+
+- **Fuente disponible:** el usuario informó que la prueba sintética completa y el registro original están en `p test.docx`, pero ese archivo no está presente en el repositorio. No se afirma haberlo inspeccionado; esta decisión usa únicamente los hallazgos reproducidos por el usuario.
+- **Mayor problema observado:** falsa seguridad creada por mensajes verdes y la confirmación “Dentro de tu límite elegido”. Mariana la interpretó repetidamente como posible aprobación de la compra aunque las comisiones, la capacidad futura y algunas fechas seguían desconocidas.
+- **Reacciones exactas proporcionadas:** “Good, so maybe I can buy it.”; “Wait, so does that mean I can afford it or not?”; “I'm answering that the payment is below my limit, not that I can safely pay it.”
+- **Corrección enfocada:** cuando falta información financiera importante, la comparación usa estilo neutral e ícono informativo. El texto dice que la **cuota anunciada** está debajo del **límite autoelegido** y coloca junto al resultado que eso solo compara dos cantidades y no demuestra que la compra sea asequible.
+- **Consistencia:** la misma regla y el mismo generador de mensajes se usan en la calculadora y en la explicación simulada. La comparación de presupuesto también deja de mostrarse como confirmación verde si persiste incertidumbre material.
+- **Control del comprador:** ningún mensaje aprueba, prohíbe o bloquea la compra; el límite continúa editable y removible.
+- **Cálculos:** no se cambió el motor financiero ni se alteró ningún resultado verificado.
+- **Regresión:** pruebas específicas verifican tono neutral, mención de datos faltantes, ausencia del mensaje ambiguo y preservación del control cuando el límite se supera.
