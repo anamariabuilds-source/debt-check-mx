@@ -32,3 +32,12 @@ Se actualizará al terminar cada ciclo con: qué cambió, qué funciona, qué fa
 - **Despliegue:** bloqueado por ausencia de autenticación/CLI de Vercel y remoto GitHub. No se afirma Deploy 1 ni Deploy 2.
 - **Blueprint / Dragon Stack:** el archivo continúa ausente y la ambigüedad continúa sin resolver.
 - **Primer paso siguiente:** conectar el repositorio a GitHub/Vercel, ejecutar Deploy 1, verificar URL; luego hacer la prueba persona en conversación nueva y desplegar su corrección real como Deploy 2.
+
+### 2026-10-15 — Recorrido manual local completado
+
+- **Tipo de evidencia:** revisión manual preliminar de la propietaria del proyecto. No es prueba de persona sintética ni investigación con usuarios reales.
+- **Cobertura confirmada:** se abrieron correctamente las cuatro pantallas: captura de datos, calculadora básica, explicación simulada y evaluación de comprensión.
+- **Comportamiento confirmado:** las comisiones desconocidas y el total final desconocido permanecieron explícitamente desconocidos.
+- **Observación preliminar 1:** las preguntas de comprensión aparecen únicamente después de ver tanto la calculadora como la explicación. Por ello, el flujo actual no establece de manera independiente si la explicación mejora la comprensión frente a la calculadora.
+- **Observación preliminar 2:** los mensajes verdes que indican que la mensualidad está dentro del límite elegido podrían crear falsa confianza cuando las comisiones y el costo final siguen siendo desconocidos.
+- **Decisión inmediata:** documentar ambos riesgos sin rediseñar todavía la aplicación. La siguiente mejora deberá elegirse y justificarse después del primer despliegue verificado.
