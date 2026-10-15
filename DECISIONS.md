@@ -63,7 +63,7 @@ Se actualizará al terminar cada ciclo con: qué cambió, qué funciona, qué fa
 - **Cálculos:** no se cambió el motor financiero ni se alteró ningún resultado verificado.
 - **Regresión:** pruebas específicas verifican tono neutral, mención de datos faltantes, ausencia del mensaje ambiguo y preservación del control cuando el límite se supera.
 
-### 2026-10-15 — Integración incremental Dragon Stack (preproducción)
+### 2026-10-15 — Integración incremental Dragon Stack
 
 - **Alcance:** se preservaron las pantallas y el motor. Se reutilizó `/api/explain`, se añadió `/api/vision` y dos controles opcionales dentro de las pantallas existentes.
 - **Componente 1:** inferencia server-side real con Google Gemini `gemini-3.5-flash-lite`; salida JSON limitada, timeout de 8 segundos, máximo de 350 tokens y validación de cifras/afirmaciones. El fallback sigue rotulado `SIMULATED AI OUTPUT`.
@@ -77,5 +77,9 @@ Se actualizará al terminar cada ciclo con: qué cambió, qué funciona, qué fa
 - **Verificación visual real:** Gemini leyó la imagen ficticia preparada y propuso exactamente precio 3,600, 6 mensualidades y cuota 600; devolvió `knownFees: null`, `feeStatus: UNKNOWN`, `dueDates: []` y `verified: false`. La imagen no contenía datos personales.
 - **Regresión de falsa tranquilidad:** una primera explicación real usó una formulación ambigua sobre estar dentro del límite. Se reforzó el prompt y el validador para exigir que solo la mensualidad anunciada se compare con el límite autoelegido y que esto no confirme capacidad de pago. La respuesta real posterior cumplió esa distinción.
 - **Verificación técnica local:** 43 pruebas pasan; TypeScript, lint y build pasan; `npm audit --omit=dev` reporta 0 vulnerabilidades.
-- **Estado honesto:** los tres componentes funcionan localmente con datos ficticios. La integración todavía no está publicada ni verificada en Vercel.
-- **Publicación:** pendiente de aprobación explícita de Fase D; no se ha hecho push ni deployment nuevo.
+- **Publicación autorizada:** commit `9158690` publicado en `origin/main` mediante push normal, sin reescritura de historial.
+- **Deployment Dragon Stack:** Vercel confirmó `READY` para `dpl_BK4Zs8XctN4NuF6XJXWkHoXJQEYP`, con alias `https://debt-check-mx.vercel.app`.
+- **Verificación pública:** la portada respondió correctamente y conservó captura manual y las cuatro etapas visibles. Sin consentimiento, `/api/explain` mantuvo `SIMULATED AI OUTPUT`, `externalProcessing: false` y los resultados deterministas. Sin código, `/api/vision` respondió HTTP 403.
+- **Gemini real en producción:** una explicación consentida devolvió `EXPLICACIÓN GENERADA CON IA`, conservó subtotal 3,600, diferencia 0, comisiones y fechas `UNKNOWN`, coincidencia de 550 e ingreso irregular; distinguió la cuota anunciada del límite autoelegido y no aprobó la compra. Una solicitud anterior activó el fallback seguro y la repetición fue válida.
+- **Visión real en producción:** la oferta completamente ficticia produjo exactamente precio 3,600, 6 mensualidades y cuota 600, con `knownFees: null`, `feeStatus: UNKNOWN`, `dueDates: []` y `verified: false`.
+- **Estado honesto:** los tres componentes funcionan localmente y en el deployment verificado con datos ficticios. No se afirma ventaja de comprensión, precisión general de visión ni validación con usuarios reales.

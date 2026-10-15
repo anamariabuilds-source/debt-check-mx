@@ -42,7 +42,7 @@ Entorno local: Node 24.19.0, Next.js 16.4.1, Vitest 5.0.5. Datos exclusivamente 
 
 El hallazgo proporcionado fue falsa seguridad causada por la confirmación verde “Dentro de tu límite elegido”. `p test.docx` no estaba presente y no fue inspeccionado; no se agregaron hallazgos distintos de los reproducidos por el usuario. La corrección M19 neutraliza el mensaje cuando existen datos materiales desconocidos y coloca la advertencia de incertidumbre junto a la comparación en ambas experiencias.
 
-## Dragon Stack — prueba preproducción
+## Dragon Stack — prueba local y de producción
 
 La suite añade casos separados para consentimiento ausente, clave faltante, respuesta Gemini válida, error, timeout, cifra inventada, preservación de UNKNOWN, autonomía y etiquetas real/simulada. Visión cubre imagen ficticia válida, firma no compatible, límite de tamaño, comisiones/fechas ausentes, ambigüedad, confirmación selectiva, rechazo, error y respuesta malformada.
 
@@ -54,4 +54,14 @@ Las respuestas de proveedor están simuladas en la suite para que las pruebas no
 - **Corrección real:** la primera respuesta válida incluyó una referencia demasiado positiva a estar dentro del límite. Se endurecieron instrucción y validación, se añadió regresión y la siguiente respuesta real aclaró que solo la cuota anunciada cumple el límite elegido y que esto no confirma capacidad de pago.
 - **Suite final:** 5 archivos, 43 pruebas; TypeScript, lint y build de producción pasan. `npm audit --omit=dev` reporta 0 vulnerabilidades.
 
-Esta evidencia es local y no implica que la integración ya esté publicada o verificada en Vercel.
+### Verificación de producción
+
+- Commit funcional: `9158690`.
+- Deployment: `dpl_BK4Zs8XctN4NuF6XJXWkHoXJQEYP`, estado `READY`, alias `https://debt-check-mx.vercel.app`.
+- La portada pública conservó captura manual, calculadora, explicación y comprensión.
+- Sin consentimiento, la explicación fue `SIMULATED AI OUTPUT`, no hubo procesamiento externo y se preservaron los cálculos.
+- Sin código de acceso, visión respondió HTTP 403.
+- Con consentimiento y código, la explicación real mantuvo subtotal 3,600, diferencia 0, comisiones/fechas `UNKNOWN`, coincidencia de pagos de 550 y autonomía del comprador. Una primera solicitud cayó al fallback seguro; la repetición real pasó.
+- Con consentimiento y código, visión extrajo 3,600, 6 y 600 de la oferta ficticia; mantuvo comisiones `UNKNOWN`, fechas vacías y `verified: false`.
+
+Esta verificación demuestra operación técnica del Dragon Stack con el ejemplo ficticio; no demuestra ventaja de comprensión ni exactitud universal del modelo.
